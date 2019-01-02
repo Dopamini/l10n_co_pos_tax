@@ -262,7 +262,7 @@ class PosOrder(models.Model):
                     anglo_saxon_lines = order._anglo_saxon_sale_move_lines(i_line)
                     all_lines.extend(anglo_saxon_lines)
 
-        for key, val in taxes.iteritems():
+        for key, val in taxes.items():
             type, dummy, dummy = key
             if type in 'out_refund':
                 name = 'Refund ' + val['name']

@@ -142,6 +142,9 @@ odoo.define('l10n_co_pos_tax.sequence', function(require) {
                     dian_resolution_sequence.number_to  = zero_pad(dian_resolution_sequence.number_to, 4)
                     receipt.dian_resolution_sequence = dian_resolution_sequence;
 
+                }else{
+                console.log('entro a no resolucion');
+                receipt.dian_resolution_sequence = false;
                 }
             }
 
