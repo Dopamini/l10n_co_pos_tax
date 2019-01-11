@@ -3,6 +3,7 @@ odoo.define('l10n_co_pos_tax.sequence', function(require) {
 
     var rpc = require('web.rpc');
     var models = require('point_of_sale.models');
+
     var core = require('web.core');
     var screens = require('point_of_sale.screens');
     var devices = require('point_of_sale.devices');
@@ -12,10 +13,12 @@ odoo.define('l10n_co_pos_tax.sequence', function(require) {
     var Class = require('web.Class');
     var utils = require('web.utils');
     var PosBaseWidget = require('point_of_sale.BaseWidget');
+    //var Model = require('web.DataModel');
     var rpc = require('web.rpc');
-    var _t = core._t;
 
-    
+
+
+    var _t = core._t;
     models.load_models([
         {
             model: 'ir.sequence',
@@ -23,8 +26,13 @@ odoo.define('l10n_co_pos_tax.sequence', function(require) {
             domain: function(self){ return ['|', ['name', 'in', self.config.sequence_id],
                                             ['name', 'in', self.config.sequence_refund_id]]; },
             loaded : function(self, sequences) {
+            console.log('aquiiiiiiiaaaa');
+            console.log('aquiiiiiiiaaaa');
+            console.log('aquiiiiiiiaaaa');
+            console.log('aquiiiiiiiaaaa');
                 self.dian_resolution = sequences[0];
                 self.dian_resolution_refund = sequences[1];
+
             }
         },
         {
@@ -39,6 +47,8 @@ odoo.define('l10n_co_pos_tax.sequence', function(require) {
                 for( var resolution in dian_resolution_ids ) {
                     ids.push( dian_resolution_ids[ resolution ] );
                 }
+
+
 
                 return [['id','in', ids],['active_resolution', '=', true]];
             },
@@ -79,6 +89,8 @@ odoo.define('l10n_co_pos_tax.sequence', function(require) {
                         actual_date <= date_to && 
                         self.dian_resolution_sequence.active_resolution ){
 
+
+
                     } else {
                         try{
                             new Model('ir.sequence').call('check_active_resolution', [self.dian_resolution.id]).then(function(data){
@@ -91,6 +103,8 @@ odoo.define('l10n_co_pos_tax.sequence', function(require) {
                         } catch( e ){
 
                         }
+                        
+
                     }
 
                 }, 3000)
@@ -110,6 +124,7 @@ odoo.define('l10n_co_pos_tax.sequence', function(require) {
             return _super;
         },
         export_for_printing: function() {
+            console.log("-...............................");
             console.log(this.pos.company_partner);
             console.log(this.pos.dian_resolution_sequence);
             var receipt = __super__.export_for_printing.apply(this);
@@ -122,11 +137,13 @@ odoo.define('l10n_co_pos_tax.sequence', function(require) {
                 dian_resolution_sequence = this.pos.dian_resolution_sequence;
             }
 
-            if(company_partner.street) {
-                var street = company_partner.street.split(",").map(function(text) { return text.trim() + '<br />'; });
+            if(company_partner[0]['street']) {
+                 console.log('prueba');
+                var street = company_partner[0]['street'].split(",").map(function(text) { return text.trim() + '<br />'; });
                 receipt.company.street = street.join("");
+
             } else {
-                receipt.company.street = "compañía sin dirección";
+                receipt.company.street = "Compañía sin Dirección";
             }
 
             if( dian_resolution_sequence != undefined ){
@@ -141,6 +158,8 @@ odoo.define('l10n_co_pos_tax.sequence', function(require) {
                     dian_resolution_sequence.number_from  = zero_pad(dian_resolution_sequence.number_from, 4)
                     dian_resolution_sequence.number_to  = zero_pad(dian_resolution_sequence.number_to, 4)
                     receipt.dian_resolution_sequence = dian_resolution_sequence;
+                    console.log('entro  resolucion');
+                    console.log(receipt.dian_resolution_sequence);
 
                 }else{
                 console.log('entro a no resolucion');
@@ -148,7 +167,7 @@ odoo.define('l10n_co_pos_tax.sequence', function(require) {
                 }
             }
 
-            receipt.company.formatedNit = company_partner.formatedNit ? company_partner.formatedNit : "no posee";
+            receipt.company.formatedNit = company_partner[0]['formatedNit'] ? company_partner[0]['formatedNit'] : "No tiene NIT";
             //receipt.company.formatedNit = "no posee";
 
             if (!this.number_next_dian) {
@@ -225,6 +244,9 @@ odoo.define('l10n_co_pos_tax.sequence', function(require) {
                 }
             }
 
+
+
+
             // if the change is too large, it's probably an input error, make the user confirm.
             if (!force_validation && order.get_total_with_tax() > 0 && (order.get_total_with_tax() * 1000 < order.get_total_paid())) {
                 this.gui.show_popup('confirm',{
@@ -280,6 +302,10 @@ odoo.define('l10n_co_pos_tax.sequence', function(require) {
                 }
             }
           
+
+
+
+
             for( var pos in order.get_orderlines() ){
                 var line = order.get_orderlines(  )[ pos ];
 
@@ -293,6 +319,7 @@ odoo.define('l10n_co_pos_tax.sequence', function(require) {
 
             }
 
+
             //var is_valid = self.order_is_valid(force_validation);
             if(order.get_total_with_tax() >= 0 && this.pos.dian_resolution_sequence != undefined) {
                 order.number_next_dian = this.pos.dian_resolution.prefix +
@@ -302,6 +329,9 @@ odoo.define('l10n_co_pos_tax.sequence', function(require) {
                 this.pos.dian_resolution_sequence_refund.number_next++;
             }
             
+
+
+
             /*if(is_valid) {
                 var order = this.pos.get_order();
                 if(order.get_total_with_tax() >= 0) {
@@ -311,6 +341,7 @@ odoo.define('l10n_co_pos_tax.sequence', function(require) {
                     order.number_next_dian = this.pos.dian_resolution_refund.prefix +
                         this.pos.dian_resolution_sequence_refund.number_next++;
                 }
+
             }*/
             this._super(force_validation);
         },
@@ -321,4 +352,5 @@ odoo.define('l10n_co_pos_tax.sequence', function(require) {
             });
         }
     });
+
 });
